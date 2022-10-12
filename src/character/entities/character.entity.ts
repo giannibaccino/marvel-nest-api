@@ -1,3 +1,4 @@
+import mongoose, { ObjectId } from "mongoose";
 import { ComicSummaryEntity } from "src/character/entities/comic-summary.entity";
 import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable} from "typeorm";
 
@@ -21,5 +22,5 @@ export class CharacterEntity {
 
     @ManyToMany(() => ComicSummaryEntity)
     @JoinTable()
-    comics: ComicSummaryEntity[];
+    comics: ObjectId[];
 }

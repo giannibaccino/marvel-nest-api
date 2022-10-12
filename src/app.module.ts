@@ -3,15 +3,13 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { CharacterModule } from './character/character.module';
+import { MarvelModule } from './character/marvel.module';
 import { MONGODB_URI, SQL_DB_DATABASE, SQL_DB_HOST, SQL_DB_PASSWORD, SQL_DB_PORT, SQL_DB_USER } from './config/constants';
-import { ComicModule } from './comic/comic.module';
 import { TypeOrmModule } from "@nestjs/typeorm";
 
 @Module({
   imports: [
-    CharacterModule,
-    ComicModule,
+    MarvelModule,
     ConfigModule.forRoot({
       envFilePath: '.env',
       isGlobal: true

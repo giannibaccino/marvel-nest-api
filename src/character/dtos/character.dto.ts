@@ -1,6 +1,9 @@
-import { ComicSummaryDto } from "./comic-summary.dto";
-import { IsNotEmpty, IsString, IsNumber } from "class-validator";
-export class CharacterDto {
+import { IsNotEmpty, IsString, IsNumber, IsArray } from "class-validator";
+import { ObjectId } from "mongoose";
+
+export class CharacterMongoDto {
+
+    _id: ObjectId;
 
     @IsNumber()
     @IsNotEmpty()
@@ -16,5 +19,26 @@ export class CharacterDto {
     @IsString()
     image: string;
 
-    comics: ComicSummaryDto[]
+    @IsArray()
+    comics: ObjectId[]
+  }
+
+export class CharacterSqlDto {
+
+    @IsNumber()
+    @IsNotEmpty()
+    id:number;
+
+    @IsString()
+    @IsNotEmpty()
+    name: string;
+
+    @IsString()
+    description: string;
+
+    @IsString()
+    image: string;
+
+    @IsArray()
+    comics: ObjectId[]
   }

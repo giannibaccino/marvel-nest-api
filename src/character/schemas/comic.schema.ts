@@ -1,7 +1,7 @@
 import { Schema } from 'mongoose';
 
 export const ComicSchema = new Schema ({
-  
+
     id: {
       type: Number, 
       required: true,

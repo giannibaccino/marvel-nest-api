@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn} from "typeorm";
+import { CharacterEntity } from "src/character/entities/character.entity";
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, ManyToMany, JoinTable} from "typeorm";
 
 @Entity('comics')
 export class ComicEntity {
@@ -20,4 +21,8 @@ export class ComicEntity {
 
     @Column({type: 'varchar', nullable: false})
     resourceURI: string;;
+
+    @ManyToMany(() => CharacterEntity)
+    @JoinTable()
+    characters: [CharacterEntity]
 }

@@ -1,5 +1,4 @@
 import { Schema } from 'mongoose';
-import { ComicSummarySchema } from 'src/character/schemas/comic-summary.schema';
 
 export const CharacterSchema = new Schema ({
   
@@ -21,7 +20,10 @@ export const CharacterSchema = new Schema ({
 
   image: {
     type: String, 
-    default: 'https://modogeeks.com/wp-content/uploads/2017/07/Marvel-Logo-1.png'},
+    default: 'https://modogeeks.com/wp-content/uploads/2017/07/Marvel-Logo-1.png'
+  },
 
-  comics: [ComicSummarySchema]
+  comics: [
+    {type: Schema.Types.ObjectId, ref: 'comics'}
+  ]
 });
