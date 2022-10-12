@@ -12,10 +12,10 @@ export class ComicEntity {
     @Column({type: 'varchar', nullable: false})
     title: string;
 
-    @Column({type: 'text', nullable: false})
+    @Column({type: 'text', nullable: true})
     description: string;
 
-    @Column({type: 'varchar', nullable: false})
+    @Column({type: 'varchar', nullable: true})
     image:string;
 
     @Column({type: 'varchar', nullable: false})

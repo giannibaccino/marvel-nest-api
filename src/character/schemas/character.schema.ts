@@ -1,5 +1,5 @@
 import { Schema } from 'mongoose';
-import { ComicSummarySchema } from 'src/comic-summary/schemas/comic-summary.schema';
+import { ComicSummarySchema } from 'src/character/schemas/comic-summary.schema';
 
 export const CharacterSchema = new Schema ({
   

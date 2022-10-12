@@ -1,6 +1,6 @@
+import { ComicSummaryDto } from "./comic-summary.dto";
 import { IsNotEmpty, IsString, IsNumber } from "class-validator";
-
-export class ComicDto {
+export class CharacterDto {
 
     @IsNumber()
     @IsNotEmpty()
@@ -8,7 +8,7 @@ export class ComicDto {
 
     @IsString()
     @IsNotEmpty()
-    title: string;
+    name: string;
 
     @IsString()
     description: string;
@@ -16,7 +16,5 @@ export class ComicDto {
     @IsString()
     image: string;
 
-    @IsString()
-    @IsNotEmpty()
-    resourceURI: string;
+    comics: ComicSummaryDto[]
   }

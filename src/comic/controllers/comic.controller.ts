@@ -1,10 +1,16 @@
-import { Controller, Get, Param, ParseArrayPipe, ParseIntPipe, Post } from '@nestjs/common';
+import { Controller, Get, HttpStatus, Param, ParseArrayPipe, ParseIntPipe, Post, Res } from '@nestjs/common';
 import { ComicService } from '../services/comic.service';
+import { ComicMongoDBService } from '../services/comicMongoDB.service';
+import { ComicMySqlService } from '../services/comicMySql.service';
 
 @Controller('comic')
 export class ComicController {
 
-    constructor(private readonly comicService: ComicService) {}
+    constructor(
+        private readonly comicService: ComicService,
+        private readonly comicMongoDBService: ComicMongoDBService,
+        private readonly comicMySqlService: ComicMySqlService,
+        ) {}
 
     @Get('all/:limit/:offset')
     async findAll(@Param('limit', ParseIntPipe) limit: number, 
@@ -27,13 +33,67 @@ export class ComicController {
     }
 
     @Post('mdb/:id')
-    async addMongoDB(@Param('id', ParseIntPipe) id: number) {
-        return await this.comicService.addComicMongoDB(id); 
+    async addMongoDB(@Res() res, @Param('id', ParseIntPipe) id: number) {
+        const exist = await this.comicMongoDBService.findByMarvelId(id);
+
+        if(!exist) {
+            await this.comicMongoDBService.addComic(id);
+            return res.status(HttpStatus.OK).json({
+                message: 'Comic added succesfully to MongoDB'
+            }); 
+        }
+
+        return res.status(HttpStatus.BAD_REQUEST).json({
+            message: 'Comic already exists in MongoDB'
+        });
     }
 
     @Post('sql/:id')
-    async addMySQL(@Param('id', ParseIntPipe) id: number) {
-        return await this.comicService.addComicMySQL(id); 
+    async addMySQL(@Res() res, @Param('id', ParseIntPipe) id: number) {
+        const exist = await this.comicMySqlService.findByMarvelId(id);
+
+        if(!exist) {
+            await this.comicMySqlService.addComic(id);
+            return res.status(HttpStatus.OK).json({
+                message: 'Comic added succesfully to MySql'
+            }); 
+        }
+
+        return res.status(HttpStatus.BAD_REQUEST).json({
+            message: 'Comic already exists in MySql'
+        }); 
+    }
+
+    @Post('add/:id')
+    async addComic(@Res() res, @Param('id', ParseIntPipe) id: number) {
+        const exist = await this.comicMongoDBService.findByMarvelId(id);
+        const exist2 = await this.comicMySqlService.findByMarvelId(id);
+
+        if(!exist && !exist2) {
+            await this.comicMongoDBService.addComic(id);
+            await this.comicMySqlService.addComic(id);
+            return res.status(HttpStatus.OK).json({
+                message: 'Comic added succesfully to both DB'
+            });
+        }
+
+        else if(exist && exist2) {
+            return res.status(HttpStatus.BAD_REQUEST).json({
+                message: 'Comic already exists on both DB'
+            });
+        }
+
+        else if(exist && !exist2) {
+            return res.status(HttpStatus.BAD_REQUEST).json({
+                message: 'Comic already exists on MongoDB, succsefully added to MySQL'
+            });
+        }
+
+        else {
+            return res.status(HttpStatus.BAD_REQUEST).json({
+                message: 'Comic already exists on MySQL, succsefully added to MongoDB'
+            });
+        }
     }
 
 }

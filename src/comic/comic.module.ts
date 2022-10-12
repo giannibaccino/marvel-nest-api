@@ -7,6 +7,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ComicSchema } from './schemas/comic.schema';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ComicEntity } from './entities/comic.entity';
+import { ComicMongoDBService } from './services/comicMongoDB.service';
+import { ComicMySqlService } from './services/comicMySql.service';
 
 @Module({
   imports: [
@@ -17,7 +19,7 @@ import { ComicEntity } from './entities/comic.entity';
     ]),
     TypeOrmModule.forFeature([ComicEntity])
   ],
-  providers: [ComicService], 
+  providers: [ComicService, ComicMongoDBService, ComicMySqlService], 
   controllers: [ComicController]
 })
 export class ComicModule {}

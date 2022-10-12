@@ -7,7 +7,6 @@ import { CharacterModule } from './character/character.module';
 import { MONGODB_URI, SQL_DB_DATABASE, SQL_DB_HOST, SQL_DB_PASSWORD, SQL_DB_PORT, SQL_DB_USER } from './config/constants';
 import { ComicModule } from './comic/comic.module';
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { ComicSummaryModule } from './comic-summary/comic-summary.module';
 
 @Module({
   imports: [
@@ -35,11 +34,10 @@ import { ComicSummaryModule } from './comic-summary/comic-summary.module';
         database: configService.get<string>(SQL_DB_DATABASE),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         synchronize: true,
-        logging: true
+        logging: false
       }),
       inject: [ConfigService],
-    }),
-    ComicSummaryModule
+    })
   ],
   controllers: [AppController],
   providers: [AppService],

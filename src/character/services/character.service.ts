@@ -1,26 +1,17 @@
 import { HttpService } from '@nestjs/axios';
-import { Global, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { InjectModel } from '@nestjs/mongoose';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Model } from 'mongoose';
 import { map, Observable } from 'rxjs';
 import { ComicDto } from 'src/comic/dto/comic.dto';
-import { ComicService } from 'src/comic/services/comic.service';
-import { Repository } from 'typeorm';
 import { HASH, MARVEL_API_URL } from '../../config/constants';
-import { CharacterDto } from '../dto/character.dto';
-import { CharacterEntity } from '../entities/character.entity';
-import { CharacterInterface } from '../interfaces/character.interface';
+import { CharacterDto } from '../dtos/character.dto';
 
 @Injectable()
 export class CharacterService {
 
     constructor(
         private readonly configService: ConfigService,
-        private readonly marvelService: HttpService,
-        @InjectModel('Character') private characterModel: Model<CharacterInterface>,
-        @InjectRepository(CharacterEntity) private characterRepository: Repository<CharacterEntity>
+        private readonly marvelService: HttpService
     ) {}
 
     async findAllCharacters(limit: number, offset: number): Promise<Observable<CharacterDto[]>> {
@@ -112,23 +103,5 @@ export class CharacterService {
                 return comicList;
             })
         )
-    }
-    
-    async addCharacterMongoDB(id: number): Promise<void> {
-        
-        this.findCharacterById(id)
-            .then(res => res.subscribe(async x => {
-                const character = new this.characterModel(x);           
-                await character.save();
-            }));
-    }
-
-    async addCharacterMySQL(id: number): Promise<void> {
-        
-        this.findCharacterById(id)
-            .then(res => res.subscribe(async x => {
-                const character = this.characterRepository.create(x);              
-                await this.characterRepository.save(character);
-            }));
     }
 }

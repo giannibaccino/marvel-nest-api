@@ -24,6 +24,7 @@ export const ComicSchema = new Schema ({
     },
   
     resourceURI: {
-      type: String
+      type: String,
+      required: true
     }
   });
