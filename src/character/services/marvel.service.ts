@@ -109,24 +109,6 @@ export class MarvelService {
         ))
     }
 
-    async findCharacterComicsIdsByCharacterId(id: number): Promise<number[]> {
-        const url = this.configService.get<string>(MARVEL_API_URL) + 
-        `/${id}/comics` + 
-        this.configService.get<string>(HASH);
-
-        return lastValueFrom(this.httpService.get(url).pipe(
-            map(res => {
-                const idList: number[] = [];
-                res.data.data.results.forEach(c => idList.push(c.id));
-                return idList;
-            })
-        ))
-    }
-
-    getComicIdFromUrlMDB(url: string): number {
-        return Number(url.substring(46));
-    }
-
     /*--- MySQL ---*/
 
     async findAllCharactersSQL(limit: number, offset: number): Promise<CharacterSqlDto[]> {
@@ -218,6 +200,50 @@ export class MarvelService {
                 return comicsIdList;
             })
         ))
+    }
+
+    /*--- Both ---*/
+
+    async findCharacterComicsIdsByCharacterId(id: number): Promise<number[]> {
+        const url = this.configService.get<string>(MARVEL_API_URL) + 
+        `/${id}/comics` + 
+        this.configService.get<string>(HASH);
+
+        return lastValueFrom(this.httpService.get(url).pipe(
+            map(res => {
+                const idList: number[] = [];
+                res.data.data.results.forEach(c => idList.push(c.id));
+                return idList;
+            })
+        ))
+    }
+
+    async findAllCharacterComicIdsByCharacterId(id: number, offset: number, count: number): Promise<number[]> {
+        const url = this.configService.get<string>(MARVEL_API_URL) + 
+        `/${id}/comics` + 
+        this.configService.get<string>(HASH) + 
+        `&limit=100&offset=${offset}`;
+
+        return lastValueFrom(this.httpService.get(url).pipe(
+            map(async res => {
+                const times: number = Math.trunc(res.data.data.total / 100);
+                const idList: number[] = [];
+
+                if(count < times) {
+                    res.data.data.results.forEach(c => idList.push(c.id));
+                    return idList.concat(await this.findAllCharacterComicIdsByCharacterId(id, offset + 100, count + 1));
+                }
+                
+                else {
+                    res.data.data.results.forEach(c => idList.push(c.id));
+                    return idList;
+                };
+            })
+        ));
+    }
+
+    getComicIdFromUrlMDB(url: string): number {
+        return Number(url.substring(46));
     }
 
     /*--- Comics ---*/

@@ -49,7 +49,7 @@ export class MongoDBService {
         const characterDto: CharacterMongoDto = await this.marvelService.findCharacterByIdMDB(id);
         const character = new this.characterModel(characterDto);
 
-        const comicIdsNum: number[] = await this.marvelService.findCharacterComicsIdsByCharacterId(id);
+        const comicIdsNum: number[] = await this.marvelService.findAllCharacterComicIdsByCharacterId(id, 0, 0);
         const comicIds: ObjectId[] = [];
 
         comicIdsNum.forEach(async cid => {

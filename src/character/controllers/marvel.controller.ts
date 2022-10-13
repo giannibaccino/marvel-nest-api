@@ -196,19 +196,28 @@ export class MarvelController {
 
     /*--- Both ---*/
     
-    @Post('test/:id')
-    async test(@Res() res, @Param('id', ParseIntPipe) id: number) {
+    @Post('mdb_add/:id')
+    async addCharacterAndComicsMDB(@Res() res, @Param('id', ParseIntPipe) id: number) {
         const exist = await this.mongoDBService.findCharacterByMarvelId(id);
 
         if(!exist){
-            await this.mongoDBService.addAllData(id);
+            const character = await this.mongoDBService.addAllData(id);
             return res.status(HttpStatus.OK).json({
-                message: 'Comic added succesfully to MongoDB'
+                message: `Character ${character.name} added succesfully to MongoDB`
             }); 
         }
 
         return res.status(HttpStatus.BAD_REQUEST).json({
-            message: 'Comic already exist'
+            message: `Character with id: ${id} already exist`
         });
+    }
+
+    @Get('test/:id')
+    async test(@Res() res, @Param('id', ParseIntPipe) id: number) {
+        const arr: number[] = await this.marvelService.findAllCharacterComicIdsByCharacterId(id, 0, 0);
+        return res.status(HttpStatus.OK).json({
+            arreglo: `Ids: ${arr}`,
+            largo: `Length: ${arr.length}`
+        })
     }
 }
