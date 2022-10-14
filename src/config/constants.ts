@@ -8,6 +8,6 @@ export const SQL_DB_PASSWORD = 'SQL_DB_PASSWORD';
 
 export const MONGODB_URI = 'MONGODB_URI'
 
-export const HASH = 'HASH'
+export const HASH = 'HASH_2'
 export const MARVEL_API_URL ='MARVEL_API_URL';
 export const MARVEL_COMICS_API_URL = 'MARVEL_COMICS_API_URL'
