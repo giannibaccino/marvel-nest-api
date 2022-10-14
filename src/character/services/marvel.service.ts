@@ -54,6 +54,8 @@ export class MarvelService {
                     characterDto.description = character.description;
                     characterDto.image =
                     character.thumbnail.path + '.' + character.thumbnail.extension;
+                    characterDto.comicAmount = 0;
+                    characterDto.comics = [];
                     
                 return characterDto;
             })
@@ -123,7 +125,7 @@ export class MarvelService {
                 res.data.data.results.forEach((c) => {
                     const characterDto = new CharacterSqlDto();
 
-                    characterDto.id = c.id;
+                    characterDto.char_id = c.id;
                     characterDto.name = c.name;
                     
                     dtoList.push(characterDto);
@@ -140,14 +142,16 @@ export class MarvelService {
             map(res => {
                 const characterDto = new CharacterSqlDto();
                 const character = res.data.data.results
-                    .find((character: CharacterSqlDto) => character.id === id);
+                    .find(character => character.id === id);
 
-                    characterDto.id = character.id;
+                    characterDto.char_id = character.id;
                     characterDto.name = character.name;
                     characterDto.description = character.description;
                     characterDto.image =
                     character.thumbnail.path + '.' + character.thumbnail.extension;
-                    
+                    characterDto.comicAmount = 0;
+                    characterDto.comics = [];
+
                 return characterDto;
             })
         ));
@@ -164,7 +168,7 @@ export class MarvelService {
                 const character = res.data.data.results
                     .find((character: CharacterSqlDto) => character.name === name);
 
-                    characterDto.id = character.id;
+                    characterDto.char_id = character.id;
                     characterDto.name = character.name;
                     characterDto.description = character.description;
                     characterDto.image =
@@ -187,12 +191,11 @@ export class MarvelService {
                 res.data.data.results.forEach((c) => {
                     const comicDto = new ComicSqlDto();
 
-                    comicDto.id = c.id;
+                    comicDto.com_id = c.id;
                     comicDto.title = c.title;
                     comicDto.description = c.description;
                     comicDto.image = c.thumbnail.path + '.' + c.thumbnail.extension;
                     comicDto.resourceURI = c.resourceURI;
-                    comicDto.characters = c.characters.items;
                     
                     comicsIdList.push(comicDto);
                 });
@@ -381,7 +384,7 @@ export class MarvelService {
                 res.data.data.results.forEach((c) => {
                     const comicDto = new ComicSqlDto();
 
-                    comicDto.id = c.id;
+                    comicDto.com_id = c.id;
                     comicDto.title = c.title;
                     
                     dtoList.push(comicDto);
@@ -395,19 +398,21 @@ export class MarvelService {
         const url = this.configService.get<string>(MARVEL_COMICS_API_URL) +
          `/${id}` +
          this.configService.get<string>(HASH);
+        
 
          return lastValueFrom(await this.httpService.get(url).pipe(
             map(res => {
                 const comicDto = new ComicSqlDto();
                 const comic = res.data.data.results
-                    .find((comic: ComicSqlDto) => comic.id === id);
-
-                    comicDto.id = comic.id;
+                    .find(comic => comic.id === id);
+                    
+                    comicDto.com_id = comic.id;
                     comicDto.title = comic.title;
                     comicDto.description = comic.description;
                     comicDto.image =
                     comic.thumbnail.path + '.' + comic.thumbnail.extension;
                     comicDto.resourceURI = comic.resourceURI;
+                    comicDto.character = [];
 
                 return comicDto;
             })
@@ -426,7 +431,7 @@ export class MarvelService {
                 res.data.data.results.forEach((c) => {
                     const comicDto = new ComicSqlDto();
 
-                    comicDto.id = c.id;
+                    comicDto.com_id = c.id;
                     comicDto.title = c.title;
                     comicDto.description = c.description;
                     comicDto.image =
@@ -446,7 +451,7 @@ export class MarvelService {
                 const comicDto = new ComicSqlDto();
                 const comic = res.data.data.results;
 
-                    comicDto.id = comic.id;
+                    comicDto.com_id = comic.id;
                     comicDto.title = comic.title;
                     comicDto.description = comic.description;
                     comicDto.image =
@@ -472,7 +477,7 @@ export class MarvelService {
                 res.data.data.results.forEach((c) => {
                     const characterDto = new CharacterSqlDto();
 
-                    characterDto.id = c.id;
+                    characterDto.char_id = c.id;
                     characterDto.name = c.name;
                     characterDto.description = c.description;
                     characterDto.image = c.thumbnail.path + '.' + c.thumbnail.extension;

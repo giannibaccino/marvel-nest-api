@@ -1,4 +1,4 @@
-import { Controller, Get, Param, ParseIntPipe, Post, Res, HttpStatus, ParseArrayPipe } from '@nestjs/common';
+import { Controller, Get, Param, ParseIntPipe, Post, Res, HttpStatus, ParseArrayPipe, BadRequestException, Put, Delete } from '@nestjs/common';
 import { MarvelService } from '../services/marvel.service';
 import { MongoDBService } from '../services/monogoDB.service';
 import { MySqlService } from '../services/mySql.service';
@@ -207,17 +207,154 @@ export class MarvelController {
             }); 
         }
 
-        return res.status(HttpStatus.BAD_REQUEST).json({
-            message: `Character with id: ${id} already exist`
-        });
+        throw new BadRequestException(`Character with id: ${id} already exist`);
     }
 
-    @Get('test/:id')
+    @Post('sql_add/:id')
+    async addCharacterAndComicsSQL(@Res() res, @Param('id', ParseIntPipe) id: number) {
+        const exist = await this.mySqlService.findCharacterByMarvelId(id);
+
+        if(!exist){
+
+            try {
+                const character = await this.mySqlService.addAllData(id);
+            return res.status(HttpStatus.OK).json({
+                message: `Character ${character.name} added succesfully to MySQL`
+            }); 
+                
+            } catch (e) {
+                if(e == HttpStatus.INTERNAL_SERVER_ERROR)
+                   return this.addCharacterAndComicsSQL(res, id);
+                throw new BadRequestException('Error en el servidor');
+            } 
+        }
+
+        throw new BadRequestException(`Character with id: ${id} already exist`);
+    }
+
+    /*--- Complete requests ---*/
+
+    @Get('list/:id')
+    async getCharacterAndComicsMDB(@Res() res, @Param('id', ParseIntPipe) id: number) {
+
+        const exist = await this.mongoDBService.findCharacterByMarvelId(id);
+
+        if(exist) {
+
+            const character = await this.mongoDBService.findCharacter(id);
+
+            return res.status(HttpStatus.OK).json({
+                character
+            });
+        }
+        
+        throw new BadRequestException(`Character with id: ${id} doesn't exist on MongoDB`)
+    }
+
+    @Post('add/:id')
+    async addCharacterAndComicsMDBAndSQL(@Res() res, @Param('id', ParseIntPipe) id: number) {
+        const exist = await this.mongoDBService.findCharacterByMarvelId(id);
+        const exist2 = await this.mySqlService.findCharacterByMarvelId(id);
+
+        if(!exist && !exist2) {
+            const char = await this.mongoDBService.addAllData(id);
+            await this.mySqlService.addAllData(id);
+            return res.status(HttpStatus.OK).json({
+                message: `Character ${char.name} and comics added succesfully to both DB`
+            });
+        }
+
+        else if(exist && exist2) {
+            throw new BadRequestException(`Character with id: ${id} already exist`);
+        }
+
+        else if(exist && !exist2) {
+            const char = await this.mySqlService.addAllData(id);
+            return res.status(HttpStatus.BAD_REQUEST).json({
+                message: `Character ${char.name} and comics already exists on MongoDB, succsefully added to MySQL`
+            });
+        }
+
+        else {
+            const char = await this.mongoDBService.addAllData(id);
+            return res.status(HttpStatus.BAD_REQUEST).json({
+                message: `Character ${char.name} and comics already exists on MySQL, succsefully added to MongoDB`
+            });
+        }
+    }
+
+    @Put('update_name/:id/:newid')
+    async updateNameMBDAndSQL(@Res() res, @Param('id', ParseIntPipe) id: number, @Param('newid', ParseIntPipe) newId: number) {
+        const exist = await this.mongoDBService.findCharacterByMarvelId(id);
+        const exist2 = await this.mySqlService.findCharacterByMarvelId(id);
+        const exist3 = await this.marvelService.findCharacterByIdMDB(newId);
+
+
+        const oldName: string = (await this.mySqlService.findCharacterByMarvelId(id)).name
+        
+        if(!exist3) {
+            throw new BadRequestException(`Character with id: ${newId} doesn't exist on Marvel Api`);
+        }
+
+        else if(exist && exist2) {
+            const updated = await this.mySqlService.updateName(id, newId);
+            await this.mongoDBService.updateName(id, newId);
+
+            return res.status(HttpStatus.OK).json({
+                nuevoNombre: `${oldName} now is ${updated.name} on both DB`
+            });
+        }
+
+        else if(!exist && !exist2) {
+            throw new BadRequestException(`Character with id: ${id} doesn't exist on any DB`);
+        }
+    }
+
+    @Delete('delete/:id')
+    async delteCharacterMDBAnsSQL(@Res() res, @Param('id', ParseIntPipe) id: number) {
+        
+        const exist = await this.mongoDBService.findCharacterByMarvelId(id);
+        const exist2 = await this.mySqlService.findCharacterByMarvelId(id);
+
+        if(exist && exist2) {
+
+            const name = await this.mongoDBService.deleteCharacter(id);
+            await this.mySqlService.deleteCharacter(id);
+
+            return res.status(HttpStatus.OK).json({
+                message: `${name} succesfully deleted from both DB`
+            });
+        }
+
+        else if(exist && !exist2) {
+
+            const name = await this.mongoDBService.deleteCharacter(id);
+
+            return res.status(HttpStatus.OK).json({
+                message: `${name} doesn't exist on MySQL, but was succesfully deleted from both MongoDB`
+            });
+        }
+
+        else if(!exist && exist2) {
+
+            const name = await this.mySqlService.deleteCharacter(id);
+
+            return res.status(HttpStatus.OK).json({
+                message: `${name} doesn't exist on MongoDB, but was succesfully deleted from both MySQL`
+            });    
+        }
+
+        throw new BadRequestException(`Character with id: ${id} doesn't exist on any DB`)
+    }
+
+    /*--- Testing ---*/
+    
+    @Get('comic_ids_test/:id')
     async test(@Res() res, @Param('id', ParseIntPipe) id: number) {
         const arr: number[] = await this.marvelService.findAllCharacterComicIdsByCharacterId(id, 0, 0);
         return res.status(HttpStatus.OK).json({
             arreglo: `Ids: ${arr}`,
             largo: `Length: ${arr.length}`
-        })
+        });
     }
 }

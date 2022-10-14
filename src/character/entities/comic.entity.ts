@@ -1,14 +1,14 @@
-import { CharacterEntity } from "src/character/entities/character.entity";
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, ManyToMany, JoinTable} from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToMany} from "typeorm";
+import { CharacterEntity } from "./character.entity";
 
 @Entity('comics')
 export class ComicEntity {
 
-    @PrimaryGeneratedColumn()
-    _id: number;
+    @PrimaryGeneratedColumn('uuid')
+    id: string;
 
     @Column({type: 'int', nullable: false, unique: true})
-    id: number;
+    com_id: number;
 
     @Column({type: 'varchar', nullable: false})
     title: string;
@@ -20,9 +20,8 @@ export class ComicEntity {
     image:string;
 
     @Column({type: 'varchar', nullable: false})
-    resourceURI: string;;
+    resourceURI: string;
 
-    @ManyToMany(() => CharacterEntity)
-    @JoinTable()
-    characters: [CharacterEntity]
+    @ManyToMany(() => CharacterEntity, (character) => character.comics)
+    characters: CharacterEntity[];
 }

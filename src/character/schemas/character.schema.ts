@@ -1,4 +1,4 @@
-import { Schema } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 
 export const CharacterSchema = new Schema ({
   
@@ -23,7 +23,11 @@ export const CharacterSchema = new Schema ({
     default: 'https://modogeeks.com/wp-content/uploads/2017/07/Marvel-Logo-1.png'
   },
 
+  comicAmount: {
+    type: Number
+  },
+
   comics: [
-    {type: Schema.Types.ObjectId, ref: 'comics'}
+    {type: Schema.Types.ObjectId, ref: 'Comic'}
   ]
 });

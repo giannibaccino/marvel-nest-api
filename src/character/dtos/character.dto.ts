@@ -1,5 +1,6 @@
 import { IsNotEmpty, IsString, IsNumber, IsArray } from "class-validator";
 import { ObjectId } from "mongoose";
+import { ComicEntity } from "../entities/comic.entity";
 
 export class CharacterMongoDto {
 
@@ -19,15 +20,22 @@ export class CharacterMongoDto {
     @IsString()
     image: string;
 
+    @IsNumber()
+    comicAmount: number;
+
     @IsArray()
     comics: ObjectId[]
   }
 
 export class CharacterSqlDto {
 
+    // @IsString()
+    // @IsNotEmpty()
+    // _id: string;
+
     @IsNumber()
     @IsNotEmpty()
-    id:number;
+    char_id:number;
 
     @IsString()
     @IsNotEmpty()
@@ -39,6 +47,9 @@ export class CharacterSqlDto {
     @IsString()
     image: string;
 
+    @IsNumber()
+    comicAmount: number;
+
     @IsArray()
-    comics: ObjectId[]
+    comics: ComicEntity[];
   }

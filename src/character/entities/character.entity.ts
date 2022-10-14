@@ -1,15 +1,14 @@
-import mongoose, { ObjectId } from "mongoose";
-import { ComicSummaryEntity } from "src/character/entities/comic-summary.entity";
 import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable} from "typeorm";
+import { ComicEntity } from "./comic.entity";
 
 @Entity('characters')
 export class CharacterEntity {
 
-    @PrimaryGeneratedColumn()
-    _id: number;
+    @PrimaryGeneratedColumn('uuid')
+    id: string;
 
     @Column({type: 'int', nullable: false, unique: true})
-    id: number;
+    char_id: number;
 
     @Column({type: 'varchar', nullable: false})
     name: string;
@@ -20,7 +19,10 @@ export class CharacterEntity {
     @Column({type: 'varchar', nullable: true})
     image:string;
 
-    @ManyToMany(() => ComicSummaryEntity)
+    @Column({type: 'int', nullable: false})
+    comicAmount: number;
+
+    @ManyToMany(() => ComicEntity, (comic) => comic.characters)
     @JoinTable()
-    comics: ObjectId[];
+    comics: ComicEntity[];
 }

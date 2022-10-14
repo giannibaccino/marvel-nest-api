@@ -66,9 +66,31 @@ export class MongoDBService {
                 comicIds.push(exist._id);
             }
             
-            await this.characterModel.findOneAndUpdate({id: id}, {comics: comicIds});   
+            await this.characterModel.findOneAndUpdate({id: id}, {comics: comicIds, comicAmount: comicIds.length}); 
         })
 
         return await character.save()
+    }
+
+    async updateName(id:number, newId: number): Promise<CharacterInterface> {
+        
+        const newName = (await this.marvelService.findCharacterByIdMDB(newId)).name;
+
+        return await this.characterModel.findOneAndUpdate({id: id}, {name: newName})
+    }
+
+    async deleteCharacter(id: number): Promise<string> {
+
+        const name = (await this.findCharacterByMarvelId(id)).name;
+
+        await this.characterModel.findOneAndDelete({id: id});
+        return name;
+    }
+
+    async findCharacter(id: number): Promise<any> {
+
+        const character = await this.characterModel.findOne({id: id}).populate('comics');
+
+        return character;
     }
 }

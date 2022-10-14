@@ -5,5 +5,6 @@ export class CharacterInterface {
     name: string;
     description: string;
     image: string;
+    comicAmount: number;
     comics: ObjectId[];
   }
